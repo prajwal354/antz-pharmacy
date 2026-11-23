@@ -12,3 +12,5 @@ export { default as SectionCard } from "./SectionCard";
 export { default as EmptyState } from "./EmptyState";
 export { default as StatValue } from "./StatValue";
 export { DataListHeader, DataListRow, DataListFooter } from "./DataList";
+export { default as DetailsDrawer } from "./DetailsDrawer";
+export { default as ContactActions } from "./ContactActions";

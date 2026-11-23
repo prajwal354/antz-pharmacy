@@ -16,13 +16,16 @@ type SegmentedTabsProps<T extends string> = {
   options: TabOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  /** Stretch the tabs to fill the full width. */
+  fullWidth?: boolean;
 };
 
 /** Pill-style tab switcher: [ Pending 8 | Shipped | All ]. Built on MUI ToggleButtonGroup. */
-export default function SegmentedTabs<T extends string>({ options, value, onChange }: SegmentedTabsProps<T>) {
+export default function SegmentedTabs<T extends string>({ options, value, onChange, fullWidth = false }: SegmentedTabsProps<T>) {
   return (
     <ToggleButtonGroup
       exclusive
+      fullWidth={fullWidth}
       value={value}
       // MUI sends null when the active tab is clicked again — ignore that so one tab stays selected.
       onChange={(_, next: T | null) => next && onChange(next)}

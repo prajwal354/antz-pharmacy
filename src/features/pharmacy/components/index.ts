@@ -6,3 +6,5 @@ export { default as UrgentRequests } from "./UrgentRequests";
 export { default as TopMedicines, type TopMedicine } from "./TopMedicines";
 export { default as RequestRow, REQUEST_COLUMNS, REQUEST_LABELS } from "./RequestRow";
 export { default as DispenseRow, DISPENSE_COLUMNS, DISPENSE_LABELS } from "./DispenseRow";
+export { default as RequestDetails } from "./details/RequestDetails";
+export { default as DispenseDetails } from "./details/DispenseDetails";

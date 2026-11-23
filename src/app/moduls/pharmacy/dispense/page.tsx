@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import { DataListFooter, DataListHeader, EmptyState, PageHeader, SearchField, SegmentedTabs, type TabOption } from "@/components/common";
 import { PlusIcon } from "@/components/icons";
 import { colors } from "@/theme";
-import { DISPENSE_COLUMNS, DISPENSE_LABELS, DispenseRow } from "@/features/pharmacy/components";
+import { DISPENSE_COLUMNS, DISPENSE_LABELS, DispenseRow, DispenseDetails } from "@/features/pharmacy/components";
 import type { DispenseTab } from "@/features/pharmacy/constants/status";
 import { DISPENSES, TOTALS } from "@/features/pharmacy/data/mockData";
 import type { Dispense } from "@/features/pharmacy/types";
@@ -28,6 +28,15 @@ export default function DispensePage() {
   const [tab, setTab] = useState<DispenseTab>("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+
+  // Details panel: which dispense was clicked, and whether the panel is open.
+  const [selected, setSelected] = useState<Dispense | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  const openDetails = (item: Dispense) => {
+    setSelected(item);
+    setPanelOpen(true);
+  };
 
   const rows = DISPENSES.filter(
     (d) => TAB_FILTERS[tab](d) && matchesSearch(search, [d.id, d.pharmacy, d.dispensedTo, ...d.medicines.map((m) => m.medicine.brand)]),
@@ -55,13 +64,15 @@ export default function DispensePage() {
         <Box sx={{ p: "4px 16px 10px" }}>
           <DataListHeader columns={DISPENSE_COLUMNS} labels={DISPENSE_LABELS} />
           {rows.map((d) => (
-            <DispenseRow key={d.id} dispense={d} />
+            <DispenseRow key={d.id} dispense={d} onClick={() => openDetails(d)} />
           ))}
           {rows.length === 0 && <EmptyState title="Nothing matches" message="Try another search or tab" />}
         </Box>
 
         <DataListFooter showing={rows.length} total={TOTALS.dispensed} page={page} pageCount={2} onPageChange={setPage} />
       </Box>
+
+      <DispenseDetails dispense={selected} open={panelOpen} onClose={() => setPanelOpen(false)} />
     </>
   );
 }

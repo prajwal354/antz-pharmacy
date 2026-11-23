@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import { DataListFooter, DataListHeader, EmptyState, PageHeader, SearchField, SegmentedTabs, type TabOption } from "@/components/common";
 import { PlusIcon } from "@/components/icons";
 import { colors } from "@/theme";
-import { REQUEST_COLUMNS, REQUEST_LABELS, RequestRow } from "@/features/pharmacy/components";
+import { REQUEST_COLUMNS, REQUEST_LABELS, RequestRow, RequestDetails } from "@/features/pharmacy/components";
 import type { RequestTab } from "@/features/pharmacy/constants/status";
 import { REQUESTS, TOTALS } from "@/features/pharmacy/data/mockData";
 import type { MedicineRequest } from "@/features/pharmacy/types";
@@ -34,6 +34,15 @@ export default function RequestsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
+  // Details panel: which request was clicked, and whether the panel is open.
+  const [selected, setSelected] = useState<MedicineRequest | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  const openDetails = (item: MedicineRequest) => {
+    setSelected(item);
+    setPanelOpen(true);
+  };
+
   const rows = REQUESTS.filter(
     (r) => TAB_FILTERS[tab](r) && matchesSearch(search, [r.id, r.to, r.requestedBy, ...r.items.map((x) => x.medicine.brand)]),
   );
@@ -60,13 +69,15 @@ export default function RequestsPage() {
         <Box sx={{ p: "4px 16px 10px" }}>
           <DataListHeader columns={REQUEST_COLUMNS} labels={REQUEST_LABELS} />
           {rows.map((r) => (
-            <RequestRow key={r.id} request={r} />
+            <RequestRow key={r.id} request={r} onClick={() => openDetails(r)} />
           ))}
           {rows.length === 0 && <EmptyState title="Nothing matches" message="Try another search or tab" />}
         </Box>
 
         <DataListFooter showing={rows.length} total={TOTALS.requests} page={page} pageCount={2} onPageChange={setPage} />
       </Box>
+
+      <RequestDetails request={selected} open={panelOpen} onClose={() => setPanelOpen(false)} />
     </>
   );
 }
