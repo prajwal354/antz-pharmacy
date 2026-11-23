@@ -35,8 +35,12 @@ export function matchesSearch(query: string, fields: string[]) {
   return !q || fields.join(" ").toLowerCase().includes(q);
 }
 
-/** Next dispense ID after the highest one so far, e.g. DIS580 → DIS581. */
-export function nextDispenseId(dispenses: { id: string }[]) {
-  const highest = Math.max(0, ...dispenses.map((d) => Number(d.id.replace(/\D/g, ""))));
-  return `DIS${highest + 1}`;
+/**
+ * Next ID after the highest one so far.
+ *   nextId(dispenses, "DIS")   DIS580    → DIS581
+ *   nextId(requests, "RES00")  RES002839 → RES002840
+ */
+export function nextId(items: { id: string }[], prefix: string) {
+  const highest = Math.max(0, ...items.map((x) => Number(x.id.replace(/\D/g, ""))));
+  return `${prefix}${highest + 1}`;
 }

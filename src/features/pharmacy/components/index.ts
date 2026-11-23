@@ -9,3 +9,4 @@ export { default as DispenseRow, DISPENSE_COLUMNS, DISPENSE_LABELS } from "./Dis
 export { default as RequestDetails } from "./details/RequestDetails";
 export { default as DispenseDetails } from "./details/DispenseDetails";
 export { default as NewDispenseDrawer, type NewDispense } from "./new-dispense/NewDispenseDrawer";
+export { default as NewRequestDrawer, type NewRequest } from "./new-request/NewRequestDrawer";

@@ -22,13 +22,20 @@ const SORT_TABS: TabOption<SortBy>[] = [
   { value: "generic", label: "By generic name" },
 ];
 
+/** Highest quantity you can ask for when stock doesn't limit it (requests). */
+const MAX_REQUEST = 999;
+
 type MedicinePickerProps = {
   picked: PickedMedicine[];
   onChange: (picked: PickedMedicine[]) => void;
+  /** true = can't pick more than is in stock (dispensing). false = no stock limit (requesting more). */
+  limitToStock?: boolean;
+  /** Small grey line under the list. */
+  note?: string;
 };
 
-/** Step 2 of New dispense: search medicines, add them, set how many. */
-export default function MedicinePicker({ picked, onChange }: MedicinePickerProps) {
+/** Search medicines, add them, set how many. Used by New dispense and New request. */
+export default function MedicinePicker({ picked, onChange, limitToStock = true, note }: MedicinePickerProps) {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortBy>("brand");
 
@@ -73,8 +80,8 @@ export default function MedicinePicker({ picked, onChange }: MedicinePickerProps
             </Box>
 
             {quantity > 0 ? (
-              // Already added → show the counter. Can't dispense more than is in stock.
-              <QuantityControl value={quantity} max={m.stock} label={m.brand} onChange={(q) => setQuantity(m, q)} />
+              // Already added → show the counter.
+              <QuantityControl value={quantity} max={limitToStock ? m.stock : MAX_REQUEST} label={m.brand} onChange={(q) => setQuantity(m, q)} />
             ) : (
               <IconButton
                 aria-label={`Add ${m.brand}`}
@@ -89,7 +96,7 @@ export default function MedicinePicker({ picked, onChange }: MedicinePickerProps
       })}
       {results.length === 0 && <EmptyState title="No medicine found" message="Try the brand or generic name" />}
 
-      <Typography sx={{ mt: 0.75, fontSize: 12, color: colors.mute }}>Batch picked automatically: earliest expiry first</Typography>
+      {note && <Typography sx={{ mt: 0.75, fontSize: 12, color: colors.mute }}>{note}</Typography>}
     </>
   );
 }

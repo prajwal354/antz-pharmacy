@@ -18,6 +18,12 @@ export const PHARMACIES = [
   "Srushti site pharmacy",
 ];
 
+/** Big pharmacies that ship medicine to the others (where requests are sent). */
+export const CENTRAL_PHARMACIES = ["Adirampattinam central pharmacy", "Central pharmacy"];
+
+/** Smaller pharmacies that ask the central ones for medicine. */
+export const LOCAL_PHARMACIES = PHARMACIES.filter((p) => !CENTRAL_PHARMACIES.includes(p));
+
 /** Each pharmacy's share of all activity (used to estimate filtered totals on the overview). */
 export const PHARMACY_SHARE: Record<string, number> = {
   "Adirampattinam central pharmacy": 0.34,

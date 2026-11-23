@@ -11,7 +11,7 @@ import { DISPENSE_COLUMNS, DISPENSE_LABELS, DispenseRow, DispenseDetails, NewDis
 import type { DispenseTab } from "@/features/pharmacy/constants/status";
 import { DISPENSES, NOW, TOTALS } from "@/features/pharmacy/data/mockData";
 import type { Dispense } from "@/features/pharmacy/types";
-import { matchesSearch, nextDispenseId, totalQuantity } from "@/features/pharmacy/utils";
+import { matchesSearch, nextId, totalQuantity } from "@/features/pharmacy/utils";
 import { ALL_PHARMACIES, usePharmacyFilters } from "@/features/pharmacy/context/PharmacyFiltersContext";
 import { dispenseMatches, scaleTotal } from "@/features/pharmacy/filters";
 
@@ -54,7 +54,7 @@ export default function DispensePage() {
   };
 
   const saveDispense = (draft: NewDispense) => {
-    const dispense: Dispense = { ...draft, id: nextDispenseId([...added, ...DISPENSES]), date: new Date(NOW) }; // NOW = "today" in the sample data
+    const dispense: Dispense = { ...draft, id: nextId([...added, ...DISPENSES], "DIS"), date: new Date(NOW) }; // NOW = "today" in the sample data
     setAdded((list) => [dispense, ...list]); // newest first
     setFormOpen(false);
     setJustAdded(dispense);

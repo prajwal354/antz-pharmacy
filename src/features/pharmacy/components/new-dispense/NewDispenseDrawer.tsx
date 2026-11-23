@@ -7,9 +7,7 @@ import Button from "@mui/material/Button";
 import { DetailsDrawer, PersonAvatar } from "@/components/common";
 import { ANIMALS, CURRENT_USER, PHARMACIES, STAFF } from "../../data/mockData";
 import type { Animal, Dispense } from "../../types";
-import FormStep from "./FormStep";
-import MedicinePicker, { type PickedMedicine } from "./MedicinePicker";
-import OptionButton from "./OptionButton";
+import { FormStep, MedicinePicker, OptionButton, type PickedMedicine } from "../form";
 
 /** Everything about a dispense except the ID and date — the page adds those when saving. */
 export type NewDispense = Omit<Dispense, "id" | "date">;
@@ -108,7 +106,7 @@ export default function NewDispenseDrawer({ open, onClose, defaultPharmacy, onSu
           done={step2Done}
           disabled={!step1Done}
         >
-          {step1Done && <MedicinePicker picked={medicines} onChange={setMedicines} />}
+          {step1Done && <MedicinePicker picked={medicines} onChange={setMedicines} note="Batch picked automatically: earliest expiry first" />}
         </FormStep>
 
         {/* 3 ─ Person */}
