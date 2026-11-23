@@ -23,3 +23,6 @@ export const PERIODS = [
   { value: "30", label: "Last 30 days" },
   { value: "7", label: "Last 7 days" },
 ] as const;
+
+/** "all" | "year" | "30" | "7" — worked out from the list above, so they never get out of sync. */
+export type Period = (typeof PERIODS)[number]["value"];

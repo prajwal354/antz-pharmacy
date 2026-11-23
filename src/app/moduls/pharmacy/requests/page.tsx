@@ -11,6 +11,8 @@ import type { RequestTab } from "@/features/pharmacy/constants/status";
 import { REQUESTS, TOTALS } from "@/features/pharmacy/data/mockData";
 import type { MedicineRequest } from "@/features/pharmacy/types";
 import { isPending, matchesSearch } from "@/features/pharmacy/utils";
+import { usePharmacyFilters } from "@/features/pharmacy/context/PharmacyFiltersContext";
+import { requestMatches, scaleTotal } from "@/features/pharmacy/filters";
 
 /** Which requests belong in each tab. */
 const TAB_FILTERS: Record<RequestTab, (r: MedicineRequest) => boolean> = {
@@ -21,15 +23,8 @@ const TAB_FILTERS: Record<RequestTab, (r: MedicineRequest) => boolean> = {
   all: () => true,
 };
 
-const TABS: TabOption<RequestTab>[] = [
-  { value: "pending", label: "Pending", count: REQUESTS.filter(isPending).length },
-  { value: "shipped", label: "Shipped" },
-  { value: "disputed", label: "Disputes" },
-  { value: "cancelled", label: "Cancelled" },
-  { value: "all", label: "All" },
-];
-
 export default function RequestsPage() {
+  const filters = usePharmacyFilters(); // header's pharmacy + period
   const [tab, setTab] = useState<RequestTab>("pending");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -43,15 +38,27 @@ export default function RequestsPage() {
     setPanelOpen(true);
   };
 
-  const rows = REQUESTS.filter(
+  // Step 1: keep requests that match the header filters.
+  const inScope = REQUESTS.filter((r) => requestMatches(r, filters));
+  // Step 2: then apply this page's tab + search box.
+  const rows = inScope.filter(
     (r) => TAB_FILTERS[tab](r) && matchesSearch(search, [r.id, r.to, r.requestedBy, ...r.items.map((x) => x.medicine.brand)]),
   );
+  const total = scaleTotal(TOTALS.requests, filters, inScope.length);
+
+  const tabs: TabOption<RequestTab>[] = [
+    { value: "pending", label: "Pending", count: inScope.filter(isPending).length },
+    { value: "shipped", label: "Shipped" },
+    { value: "disputed", label: "Disputes" },
+    { value: "cancelled", label: "Cancelled" },
+    { value: "all", label: "All" },
+  ];
 
   return (
     <>
       <PageHeader
         title="Requests"
-        count={TOTALS.requests}
+        count={total}
         description="Medicine requests sent to a central pharmacy, and what has been shipped."
         action={
           <Button variant="outlined" color="inherit" startIcon={<PlusIcon sx={{ fontSize: 15 }} />} sx={{ bgcolor: colors.surface, borderColor: colors.line }}>
@@ -62,7 +69,7 @@ export default function RequestsPage() {
 
       <Box sx={{ borderRadius: "20px", bgcolor: colors.surface, overflow: "hidden" }}>
         <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1.25, p: 2, borderBottom: `1px solid ${colors.line2}` }}>
-          <SegmentedTabs options={TABS} value={tab} onChange={setTab} />
+          <SegmentedTabs options={tabs} value={tab} onChange={setTab} />
           <SearchField value={search} onChange={setSearch} placeholder="Search request ID, medicine or person" />
         </Box>
 
@@ -71,10 +78,10 @@ export default function RequestsPage() {
           {rows.map((r) => (
             <RequestRow key={r.id} request={r} onClick={() => openDetails(r)} />
           ))}
-          {rows.length === 0 && <EmptyState title="Nothing matches" message="Try another search or tab" />}
+          {rows.length === 0 && <EmptyState title="Nothing matches" message="Try another search, tab, pharmacy or period" />}
         </Box>
 
-        <DataListFooter showing={rows.length} total={TOTALS.requests} page={page} pageCount={2} onPageChange={setPage} />
+        <DataListFooter showing={rows.length} total={total} page={page} pageCount={total > rows.length ? 2 : 1} onPageChange={setPage} />
       </Box>
 
       <RequestDetails request={selected} open={panelOpen} onClose={() => setPanelOpen(false)} />

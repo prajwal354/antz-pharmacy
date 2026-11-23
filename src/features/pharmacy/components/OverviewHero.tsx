@@ -8,10 +8,15 @@ import { ROUTES } from "@/constants/routes";
 import { gradients } from "@/theme";
 import { formatINR, formatNumber } from "@/utils/format";
 
-type OverviewHeroProps = { requests: number; value: number };
+type OverviewHeroProps = {
+  requests: number;
+  value: number;
+  /** Small caps line at the top, e.g. "Pharmacy · all time · all pharmacies". */
+  caption: string;
+};
 
 /** The big dark-blue card at the top of the overview. */
-export default function OverviewHero({ requests, value }: OverviewHeroProps) {
+export default function OverviewHero({ requests, value, caption }: OverviewHeroProps) {
   return (
     <ButtonBase
       component={NextLink}
@@ -65,7 +70,7 @@ export default function OverviewHero({ requests, value }: OverviewHeroProps) {
               verticalAlign: "1px",
             }}
           />
-          Pharmacy · all time · all pharmacies
+          {caption}
         </Box>
         <CornerArrow light />
       </Box>

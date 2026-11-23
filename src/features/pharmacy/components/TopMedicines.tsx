@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-import { SectionCard } from "@/components/common";
+import { EmptyState, SectionCard } from "@/components/common";
 import { ROUTES } from "@/constants/routes";
 import { colors, gradients } from "@/theme";
 import type { Medicine } from "../types";
@@ -13,6 +13,7 @@ export default function TopMedicines({ items }: { items: TopMedicine[] }) {
 
   return (
     <SectionCard title="Most dispensed medicines" viewAllHref={ROUTES.pharmacy.dispense}>
+      {items.length === 0 && <EmptyState title="Nothing dispensed" message="Try another pharmacy or period" />}
       {items.map(({ medicine, units }) => (
         <Box
           key={medicine.brand}

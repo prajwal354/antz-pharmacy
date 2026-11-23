@@ -18,6 +18,17 @@ export const PHARMACIES = [
   "Srushti site pharmacy",
 ];
 
+/** Each pharmacy's share of all activity (used to estimate filtered totals on the overview). */
+export const PHARMACY_SHARE: Record<string, number> = {
+  "Adirampattinam central pharmacy": 0.34,
+  "Central pharmacy": 0.18,
+  "Neeta local pharmacy": 0.12,
+  "Mammu local pharmacy": 0.1,
+  "Hospital pharmacy": 0.1,
+  "Raptor ward pharmacy": 0.08,
+  "Srushti site pharmacy": 0.08,
+};
+
 export const MEDICINES: Medicine[] = [
   { brand: "Meloxivet", generic: "Meloxicam 1.5 mg/ml", pack: "Bottle of 100 ml", price: 640, stock: 22 },
   { brand: "Ivermec", generic: "Ivermectin 1%", pack: "Vial of 50 ml", price: 420, stock: 177 },

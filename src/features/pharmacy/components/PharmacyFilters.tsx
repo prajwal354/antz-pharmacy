@@ -10,22 +10,22 @@ import Select from "@mui/material/Select";
 import { CalendarIcon, ChevronDownIcon, MedicalCrossIcon, SearchIcon } from "@/components/icons";
 import { colors } from "@/theme";
 import { PHARMACIES } from "../data/mockData";
-import { PERIODS } from "../constants/status";
-
-const ALL = "All pharmacies";
+import { PERIODS, type Period } from "../constants/status";
+import { ALL_PHARMACIES, usePharmacyFilters } from "../context/PharmacyFiltersContext";
 
 /**
  * Header controls: pharmacy picker + period dropdown.
- * NOTE: for now these only change what's shown in the header. To make them filter the
- * lists, move this state into a React Context that the pages can read.
+ * The chosen values live in PharmacyFiltersContext, so every pharmacy page sees them.
  */
 export default function PharmacyFilters() {
-  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-  const [pharmacy, setPharmacy] = useState(ALL);
-  const [query, setQuery] = useState("");
-  const [period, setPeriod] = useState<string>("all");
+  // Shared state (from Context) — changing it updates every page that reads it.
+  const { pharmacy, setPharmacy, period, setPeriod } = usePharmacyFilters();
 
-  const options = [ALL, ...PHARMACIES].filter((p) => p.toLowerCase().includes(query.toLowerCase()));
+  // Local state — only this component cares about these.
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const [query, setQuery] = useState("");
+
+  const options = [ALL_PHARMACIES, ...PHARMACIES].filter((p) => p.toLowerCase().includes(query.toLowerCase()));
 
   return (
     <>
@@ -85,7 +85,7 @@ export default function PharmacyFilters() {
 
       <Select
         value={period}
-        onChange={(e) => setPeriod(e.target.value)}
+        onChange={(e) => setPeriod(e.target.value as Period)}
         IconComponent={ChevronDownIcon}
         input={<InputBase />}
         startAdornment={<CalendarIcon sx={{ fontSize: 16, mr: 1 }} />}
