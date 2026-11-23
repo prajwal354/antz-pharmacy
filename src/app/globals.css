@@ -1,0 +1,7 @@
+/* Layer order: MUI styles sit below Tailwind utilities, so a Tailwind class can override MUI. */
+@layer theme, base, mui, components, utilities;
+@import "tailwindcss";
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
