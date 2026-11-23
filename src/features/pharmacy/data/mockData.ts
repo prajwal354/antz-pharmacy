@@ -42,9 +42,21 @@ export const MEDICINES: Medicine[] = [
   { brand: "Metronidazole", generic: "Metronidazole 400 mg", pack: "Strip of 15 tablets", price: 48, stock: 230 },
 ];
 
+/** People who can receive medicine in the "New dispense" form. */
+export const STAFF = [
+  { name: "Neeta Rao", role: "Super admin" },
+  { name: "Bharathi W", role: "Pharmacist" },
+  { name: "Kunal Singh", role: "Veterinarian" },
+  { name: "Ovi Wagh", role: "Keeper" },
+  { name: "Meera Iyer", role: "Keeper" },
+];
+
+/** The logged-in user (shown as "Dispensed by"). */
+export const CURRENT_USER = "Neeta Rao";
+
 const PEOPLE = ["Sourav Tambe", "Kunal Singh", "Deelip Kumar", "Neeta Rao", "Meera Iyer", "Bharathi W", "Ovi Wagh", "Ravi Kumar"];
 
-const ANIMALS: Animal[] = [
+export const ANIMALS: Animal[] = [
   { slug: "bengal-tiger", name: "Bengal tiger", scientificName: "Panthera tigris tigris", enclosure: "Big cat 1" },
   { slug: "chital", name: "Chital", scientificName: "Axis axis", enclosure: "Paddock 4" },
   { slug: "sloth-bear", name: "Sloth bear", scientificName: "Melursus ursinus", enclosure: "Bear den" },

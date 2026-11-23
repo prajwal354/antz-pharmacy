@@ -3,15 +3,16 @@
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
 import { DataListFooter, DataListHeader, EmptyState, PageHeader, SearchField, SegmentedTabs, type TabOption } from "@/components/common";
 import { PlusIcon } from "@/components/icons";
 import { colors } from "@/theme";
-import { DISPENSE_COLUMNS, DISPENSE_LABELS, DispenseRow, DispenseDetails } from "@/features/pharmacy/components";
+import { DISPENSE_COLUMNS, DISPENSE_LABELS, DispenseRow, DispenseDetails, NewDispenseDrawer, type NewDispense } from "@/features/pharmacy/components";
 import type { DispenseTab } from "@/features/pharmacy/constants/status";
-import { DISPENSES, TOTALS } from "@/features/pharmacy/data/mockData";
+import { DISPENSES, NOW, TOTALS } from "@/features/pharmacy/data/mockData";
 import type { Dispense } from "@/features/pharmacy/types";
-import { matchesSearch } from "@/features/pharmacy/utils";
-import { usePharmacyFilters } from "@/features/pharmacy/context/PharmacyFiltersContext";
+import { matchesSearch, nextDispenseId, totalQuantity } from "@/features/pharmacy/utils";
+import { ALL_PHARMACIES, usePharmacyFilters } from "@/features/pharmacy/context/PharmacyFiltersContext";
 import { dispenseMatches, scaleTotal } from "@/features/pharmacy/filters";
 
 const TAB_FILTERS: Record<DispenseTab, (d: Dispense) => boolean> = {
@@ -41,13 +42,31 @@ export default function DispensePage() {
     setPanelOpen(true);
   };
 
+  // New dispense form. `added` = dispenses made in this visit (sample data only, lost on reload).
+  const [added, setAdded] = useState<Dispense[]>([]);
+  const [formOpen, setFormOpen] = useState(false);
+  const [formKey, setFormKey] = useState(0); // new key → React builds a fresh, empty form
+  const [justAdded, setJustAdded] = useState<Dispense | null>(null); // for the "Dispensed..." message
+
+  const openForm = () => {
+    setFormKey((k) => k + 1);
+    setFormOpen(true);
+  };
+
+  const saveDispense = (draft: NewDispense) => {
+    const dispense: Dispense = { ...draft, id: nextDispenseId([...added, ...DISPENSES]), date: new Date(NOW) }; // NOW = "today" in the sample data
+    setAdded((list) => [dispense, ...list]); // newest first
+    setFormOpen(false);
+    setJustAdded(dispense);
+  };
+
   // Step 1: keep dispenses that match the header filters.
-  const inScope = DISPENSES.filter((d) => dispenseMatches(d, filters));
+  const inScope = [...added, ...DISPENSES].filter((d) => dispenseMatches(d, filters));
   // Step 2: then apply this page's tab + search box.
   const rows = inScope.filter(
     (d) => TAB_FILTERS[tab](d) && matchesSearch(search, [d.id, d.pharmacy, d.dispensedTo, ...d.medicines.map((m) => m.medicine.brand)]),
   );
-  const total = scaleTotal(TOTALS.dispensed, filters, inScope.length);
+  const total = scaleTotal(TOTALS.dispensed + added.length, filters, inScope.length);
 
   return (
     <>
@@ -56,7 +75,7 @@ export default function DispensePage() {
         count={total}
         description="Medicines handed out from a pharmacy to a keeper or vet, for an animal."
         action={
-          <Button variant="outlined" color="inherit" startIcon={<PlusIcon sx={{ fontSize: 15 }} />} sx={{ bgcolor: colors.surface, borderColor: colors.line }}>
+          <Button onClick={openForm} variant="outlined" color="inherit" startIcon={<PlusIcon sx={{ fontSize: 15 }} />} sx={{ bgcolor: colors.surface, borderColor: colors.line }}>
             New dispense
           </Button>
         }
@@ -80,6 +99,34 @@ export default function DispensePage() {
       </Box>
 
       <DispenseDetails dispense={selected} open={panelOpen} onClose={() => setPanelOpen(false)} />
+
+      <NewDispenseDrawer
+        key={formKey}
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        defaultPharmacy={filters.pharmacy === ALL_PHARMACIES ? "" : filters.pharmacy}
+        onSubmit={saveDispense}
+      />
+
+      <Snackbar
+        open={Boolean(justAdded)}
+        autoHideDuration={5000}
+        onClose={() => setJustAdded(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        message={justAdded && `${justAdded.id} · dispensed ${totalQuantity(justAdded)} units to ${justAdded.dispensedTo}`}
+        action={
+          <Button
+            size="small"
+            sx={{ color: colors.limeSoft }}
+            onClick={() => {
+              if (justAdded) openDetails(justAdded);
+              setJustAdded(null);
+            }}
+          >
+            View
+          </Button>
+        }
+      />
     </>
   );
 }

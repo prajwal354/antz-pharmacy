@@ -34,3 +34,9 @@ export function matchesSearch(query: string, fields: string[]) {
   const q = query.trim().toLowerCase();
   return !q || fields.join(" ").toLowerCase().includes(q);
 }
+
+/** Next dispense ID after the highest one so far, e.g. DIS580 → DIS581. */
+export function nextDispenseId(dispenses: { id: string }[]) {
+  const highest = Math.max(0, ...dispenses.map((d) => Number(d.id.replace(/\D/g, ""))));
+  return `DIS${highest + 1}`;
+}
